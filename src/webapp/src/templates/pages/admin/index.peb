@@ -6,7 +6,7 @@
 <h1>Welcome to the admin panel</h1>
 <p>You're logged in as {{ model.userName }}</p>
 
-<table class="table is-striped">
+<table class="table is-striped" data-controller="table">
     <thead>
     <tr>
         <th>Full Name</th>
@@ -18,7 +18,7 @@
     <tbody>
         {% for account in model.accounts %}
         <tr data-test="account-row-{{ account.email }}">
-            <td>{{ account.fullName }}</td>
+            <td><a href="/admin/user/{{ account.publicId }}">{{ account.fullName }}</a></td>
             <td>{{ account.handle }}</td>
             <td>{{ account.email }}</td>
             <td>

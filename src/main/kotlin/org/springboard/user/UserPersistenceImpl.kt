@@ -18,7 +18,7 @@ interface UserPersistence {
 }
 
 interface InternalUserPersistence {
-    fun getUsers(email: String? = null, queryByAccountId: Long? = null): List<UserQueryResult>
+    fun getUsers(email: String? = null, queryByAccountId: Long? = null, publicId: UUID? = null): List<UserQueryResult>
 }
 
 data class UserToStore(
@@ -97,7 +97,7 @@ class UserPersistenceImpl(private val jdbi: Jdbi) : UserPersistence, InternalUse
         return getUsers(email, queryByAccountId).firstOrNull()
     }
 
-    override fun getUsers(email: String?, queryByAccountId: Long?): List<UserQueryResult> {
+    override fun getUsers(email: String?, queryByAccountId: Long?, publicId: UUID?): List<UserQueryResult> {
         return jdbi.withHandle<List<UserQueryResult>, RuntimeException> { handle ->
             handle.createQuery(
                     """
@@ -112,10 +112,11 @@ class UserPersistenceImpl(private val jdbi: Jdbi) : UserPersistence, InternalUse
                         LEFT JOIN auth_authorities auth ON account_authorities.authority_id = auth.authority_id
                     WHERE (:email IS NULL OR email_address = :email)
                         AND (:account_id IS NULL OR a.account_id = :account_id)
-    
+                        AND (:public_id::uuid IS NULL OR a.public_account_id = :public_id)
             """
             ).bind("email", email)
                     .bind("account_id", queryByAccountId)
+                    .bind("public_id", publicId)
                     .registerRowMapper(factory(SchemaAccount::class.java, "a"))
                     .registerRowMapper(factory(SchemaAuthAuthority::class.java, "auth"))
                     .reduceRows(mutableMapOf<Long, UserQueryResult>()) { acc, row ->

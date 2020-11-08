@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationListener
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.stereotype.Component
+import java.util.*
 
 interface IAdminService {
     fun createAdminFromEmail(email: String, password: String): UserCreationResult
 
     fun getAccounts(queryingAsAccount: Long): List<Account>
+    fun getAccount(accountId: Long, publicId: UUID): Account?
 }
 
 @Component
@@ -53,5 +55,15 @@ class AdminServiceImpl(private val userService: UserService,
         }
 
         return persistence.getAllAccounts()
+    }
+
+    override fun getAccount(accountId: Long, publicId: UUID): Account? {
+        val isAdmin = userPersistence.getUserByAccount(accountId)?.isAdmin() ?: false
+
+        require(isAdmin) {
+            "Attempting to retrieve account as a non-admin user!"
+        }
+
+        return persistence.getAccount(publicId)
     }
 }

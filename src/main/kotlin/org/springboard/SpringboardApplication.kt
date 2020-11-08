@@ -2,6 +2,7 @@ package org.springboard
 
 import org.jdbi.v3.core.Jdbi
 import org.jdbi.v3.core.kotlin.KotlinPlugin
+import org.jdbi.v3.postgres.PostgresPlugin
 import org.jdbi.v3.sqlobject.SqlObjectPlugin
 import org.jdbi.v3.sqlobject.kotlin.KotlinSqlObjectPlugin
 import org.springboard.auth.AuthRole
@@ -35,6 +36,7 @@ class BeanConfig {
         jdbi.installPlugin(KotlinPlugin())
         jdbi.installPlugin(KotlinSqlObjectPlugin())
         jdbi.installPlugin(SqlObjectPlugin())
+        jdbi.installPlugin(PostgresPlugin())
         return jdbi
     }
 
